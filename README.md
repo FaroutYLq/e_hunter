@@ -22,3 +22,67 @@ S2s are slightly more complicated. First we need to drift the electrons up, and 
 
 When we have our lists of channels and timing we can generate actual pulses. First we add a pmt transition time. Then we loop over all channels, calculate the double pe emission probabilities, and add a current in the pmt channel based on the arrival time. This is all stored in a big dictionary. Afterwards this is passed to our fake digitizers which then returns you with your very own pretty data
 
+---
+
+# What did I do to generate the data?
+
+- Problem: seems that the instruction is never working?
+
+  - How is it called?
+
+  - Let's change the chunk size stuff, and see if we got different size fo simulated data.
+
+    ```python
+    st.set_config(dict(nchunk=2, event_rate=5, chunk_size=10, z = -5, n_electron = 5)) 
+    # Generate events at -5 cm,
+    # Only 5 electrons generated
+    # nchunk changed from 1
+    ```
+
+    ```python
+    /opt/XENONnT/anaconda/envs/XENONnT_development/lib/python3.6/site-packages/strax/context.py:589: UserWarning: Option n_mveto_pmts not taken by any registered plugin
+      plugins = self._get_plugins(targets, run_id)
+    /opt/XENONnT/anaconda/envs/XENONnT_development/lib/python3.6/site-packages/strax/context.py:589: UserWarning: Option n_nveto_pmts not taken by any registered plugin
+      plugins = self._get_plugins(targets, run_id)
+    /opt/XENONnT/anaconda/envs/XENONnT_development/lib/python3.6/site-packages/strax/context.py:589: UserWarning: Option gain_model_nv not taken by any registered plugin
+      plugins = self._get_plugins(targets, run_id)
+    /opt/XENONnT/anaconda/envs/XENONnT_development/lib/python3.6/site-packages/strax/context.py:589: UserWarning: Option gain_model_mv not taken by any registered plugin
+      plugins = self._get_plugins(targets, run_id)
+    /opt/XENONnT/anaconda/envs/XENONnT_development/lib/python3.6/site-packages/strax/context.py:589: UserWarning: Option channel_map not taken by any registered plugin
+      plugins = self._get_plugins(targets, run_id)
+    /opt/XENONnT/anaconda/envs/XENONnT_development/lib/python3.6/site-packages/strax/context.py:589: UserWarning: Option z not taken by any registered plugin
+      plugins = self._get_plugins(targets, run_id)
+    /opt/XENONnT/anaconda/envs/XENONnT_development/lib/python3.6/site-packages/strax/context.py:589: UserWarning: Option n_electron not taken by any registered plugin
+      plugins = self._get_plugins(targets, run_id)
+    /opt/XENONnT/anaconda/envs/XENONnT_development/lib/python3.6/site-packages/strax/context.py:1259: UserWarning: Option n_mveto_pmts not taken by any registered plugin
+      p = self._get_plugins((target,), run_id)[target]
+    /opt/XENONnT/anaconda/envs/XENONnT_development/lib/python3.6/site-packages/strax/context.py:1259: UserWarning: Option n_nveto_pmts not taken by any registered plugin
+      p = self._get_plugins((target,), run_id)[target]
+    /opt/XENONnT/anaconda/envs/XENONnT_development/lib/python3.6/site-packages/strax/context.py:1259: UserWarning: Option gain_model_nv not taken by any registered plugin
+      p = self._get_plugins((target,), run_id)[target]
+    /opt/XENONnT/anaconda/envs/XENONnT_development/lib/python3.6/site-packages/strax/context.py:1259: UserWarning: Option gain_model_mv not taken by any registered plugin
+      p = self._get_plugins((target,), run_id)[target]
+    /opt/XENONnT/anaconda/envs/XENONnT_development/lib/python3.6/site-packages/strax/context.py:1259: UserWarning: Option channel_map not taken by any registered plugin
+      p = self._get_plugins((target,), run_id)[target]
+    /opt/XENONnT/anaconda/envs/XENONnT_development/lib/python3.6/site-packages/strax/context.py:1259: UserWarning: Option z not taken by any registered plugin
+      p = self._get_plugins((target,), run_id)[target]
+    /opt/XENONnT/anaconda/envs/XENONnT_development/lib/python3.6/site-packages/strax/context.py:1259: UserWarning: Option n_electron not taken by any registered plugin
+      p = self._get_plugins((target,), run_id)[target]
+    Simulating Raw Records:  10%|▉         | 19/193 [00:20<02:50,  1.02it/s]
+    ```
+
+    Yes it is called. But how about the others (`z`, `n_electron`)?
+
+  - `strax_interface.py`:
+
+    ```python
+        def setup(self):
+            c = self.config
+            c.update(get_resource(c['fax_config'], fmt='json'))
+    				(...)
+            else:
+                self.instructions = rand_instructions(c)
+    ```
+
+    
+
